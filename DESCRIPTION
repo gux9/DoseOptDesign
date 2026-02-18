@@ -1,0 +1,46 @@
+Package: dosopt
+Type: Package
+Title: Utility Score Framework for Dose Optimization Studies
+Version: 0.1.0
+Date: 2026-02-18
+Authors@R: c(
+    person("Xuemin", "Gu", role = c("aut", "cre"),
+           email = "xuemin.gu@bicycletx.com"),
+    person("Cong", "Xu", role = "aut"),
+    person("Lei", "Xu", role = "aut"),
+    person("Ying", "Yuan", role = "aut"))
+Description: Implements a frequentist framework for one-stage randomized dose
+    optimization studies under the FDA Project Optimus initiative. The package
+    provides: (1) a margin-based utility score approach integrating binary
+    efficacy and safety endpoints; (2) closed-form and exact sample size
+    formulas to achieve prespecified Probabilities of Correct Selection (PCS);
+    (3) analytical expressions for selection-induced bias in response rate
+    estimation; (4) Type I error inflation calculations for binary and
+    time-to-event confirmatory endpoints; and (5) Monte Carlo simulation
+    validation. The framework generalizes the one-stage Randomized Optimal
+    Selection (ROSE) design as a special case. An interactive Shiny application
+    is included for design exploration and simulation.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.0.0)
+Imports:
+    stats,
+    methods
+Suggests:
+    shiny (>= 1.7.0),
+    shinythemes,
+    DT,
+    shinyBS,
+    copula,
+    survival,
+    future.apply,
+    parallelly,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+RoxygenNote: 7.3.2
+Config/testthat/edition: 3
+URL: https://github.com/xueminGu/dosopt
+BugReports: https://github.com/xueminGu/dosopt/issues

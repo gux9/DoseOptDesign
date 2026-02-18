@@ -1,0 +1,128 @@
+---
+title: "Sample Size Methods: Approximate, Exact, and Direct Approaches"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sample Size Methods: Approximate, Exact, and Direct Approaches}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(dosopt)
+```
+
+## Overview
+
+**dosopt** provides four distinct approaches for sample size determination:
+
+| Mode | Function | Method | Notes |
+|------|----------|--------|-------|
+| 1–3 | `calc_sample_size_utility_approx()` | Normal approximation | Fast; suitable for planning |
+| 1–3 | `calc_sample_size_utility_exact()` | Exact multinomial PMF | More precise; DP-based |
+| Special | `calc_sample_size_rose_approx()` | Normal approx (efficacy only) | Recovers Wang et al. 2025 |
+| Special | `calc_sample_size_rose_exact()` | Exact binomial PMF | |
+| 4 | `sample_size_direct_approx()` | Multi-scenario direct | Worst-case robust design |
+| 4 | `sample_size_direct_exact()` | Exact multi-scenario | |
+
+## Approximate vs. Exact
+
+The normal approximation uses the CLT for the utility score difference $\bar{U}_H - \bar{U}_L$. The exact approach enumerates all possible $(S_H, S_L) = (\sum U_{H,i}, \sum U_{L,i})$ values via dynamic programming on multinomial PMFs and finds the smallest $n$ satisfying both PCS constraints.
+
+```{r approx-vs-exact}
+# Common parameters
+pars <- list(pL = 0.30, qL = 0.70, delta = 0.10, d = 0.15,
+             phi = 0, alpha_L = 0.80, alpha_H = 0.80)
+
+res_a <- do.call(calc_sample_size_utility_approx, pars)
+res_e <- do.call(calc_sample_size_utility_exact, c(pars, list(max_n = 300)))
+
+cat("Approximate n =", res_a$n, " | lambda_u =", round(res_a$lambda_u, 4), "\n")
+cat("Exact      n =", res_e$n, " | lambda_u =", round(res_e$lambda_u, 4), "\n")
+cat("PCS_L (exact):", round(res_e$PCS_L, 3),
+    " | PCS_H (exact):", round(res_e$PCS_H, 3), "\n")
+```
+
+The exact approach typically returns $n$ equal to or slightly larger than the approximation, with PCS guaranteed to meet the target.
+
+## ROSE Design as a Special Case
+
+When $u = (1, 1, 0, 0)$ (efficacy only, toxicity ignored), the utility framework reduces to the ROSE design of Wang et al. (2025).
+
+```{r rose-equivalence}
+rose_u <- calc_sample_size_utility_approx(
+  pL = 0.40, qL = 0.80, delta = 0.15, d = 0.15,
+  phi = 0, alpha_L = 0.80, alpha_H = 0.80,
+  u = c(1, 1, 0, 0)
+)
+rose_native <- calc_sample_size_rose_approx(pL = 0.40, delta = 0.15,
+                                            alpha_L = 0.80, alpha_H = 0.80)
+cat("Utility (u=1,1,0,0): n =", rose_u$n, "\n")
+cat("ROSE native:          n =", rose_native$n, "\n")
+```
+
+## Mode 2: Partial-Direct
+
+Provide efficacy and toxicity rates for both doses under each selection scenario:
+
+```{r mode2}
+res_m2 <- calc_sample_size_utility_approx(
+  pL    = 0.30, qL = 0.70,
+  pH_L  = 0.20, qH_L = 0.05,   # higher-dose rates if lower dose is optimal
+  pL_H  = 0.42, qL_H = 0.15,   # lower-dose rates if higher dose is optimal
+  phi   = 0,
+  alpha_L = 0.80, alpha_H = 0.80,
+  mode  = 2
+)
+print(res_m2)
+```
+
+## Mode 3: Full-Direct
+
+Specify all 8 marginal rate parameters (plus utility scores if not using canonical weights):
+
+```{r mode3}
+res_m3 <- calc_sample_size_utility_approx(
+  pL    = 0.30, qL = 0.70,
+  pH_L  = 0.20, qH_L = 0.05,
+  pL_H  = 0.42, qL_H = 0.15,
+  pH_H  = 0.48, qH_H = 0.30,   # higher-dose rates if higher dose is optimal
+  pL_L  = 0.28, qL_L = 0.68,   # lower-dose rates if lower dose is optimal
+  phi   = 0,
+  alpha_L = 0.80, alpha_H = 0.80,
+  mode  = 3
+)
+print(res_m3)
+```
+
+## Mode 4: Multi-Scenario Direct Approach
+
+This approach enumerates a set of dose scenarios and designs for the worst case, ensuring robustness across possible true response rates.
+
+```{r mode4}
+res_d <- sample_size_direct_approx(
+  p     = c(0.28, 0.30, 0.35, 0.40),  # efficacy rates across scenarios
+  q     = c(0.55, 0.60, 0.65, 0.72),  # toxicity rates across scenarios
+  delta = 0.10, d = 0.15,
+  alpha_L = 0.80, alpha_H = 0.80
+)
+print(res_d)
+```
+
+The design sample size is the maximum $n$ across all binding scenarios, along with the associated selection thresholds.
+
+## Sensitivity to Correlation
+
+```{r correlation}
+phi_vals <- c(-0.3, 0, 0.3)
+ns <- sapply(phi_vals, function(ph) {
+  calc_sample_size_utility_approx(
+    pL = 0.30, qL = 0.70, delta = 0.10, d = 0.15,
+    phi = ph, alpha_L = 0.80, alpha_H = 0.80
+  )$n
+})
+names(ns) <- paste0("phi=", phi_vals)
+print(ns)
+```
+
+Positive correlation (efficacy and toxicity tend to co-occur) generally increases sample size requirements.

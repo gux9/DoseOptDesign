@@ -1,0 +1,100 @@
+---
+title: "Introduction to dosopt"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to dosopt}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>"
+)
+library(dosopt)
+```
+
+## Motivation
+
+FDA's **Project Optimus** initiative requires sponsors to characterize the dose–response relationship for both efficacy and safety, not merely identify the maximum tolerated dose. The **dosopt** package implements a frequentist, one-stage randomized dose optimization design that selects the optimal dose using a composite **utility score** balancing binary efficacy and safety endpoints.
+
+## The Utility Score
+
+For a patient with binary efficacy $X$ and binary toxicity $Y$, the utility score is
+
+$$U = u_1 X(1-Y) + u_2 XY + u_3 (1-X)(1-Y) + u_4 (1-X)Y,$$
+
+where $u_1 \geq u_2, u_3 \geq u_4$ and the independence constraint $u_1 - u_2 - u_3 + u_4 = 0$ holds.
+
+Canonical weights derived from margins $(\delta, d)$ are
+
+$$u_2 = \frac{1}{1+r},\quad u_3 = \frac{r}{1+r}, \quad r = \frac{\delta}{d}.$$
+
+```{r utility-scores}
+# Utility weights for delta = 0.10, d = 0.15  =>  r = 2/3
+u <- calc_utility(r = 0.10 / 0.15)
+print(u)
+```
+
+## Joint Outcome Probabilities
+
+Given marginal rates $(p, q)$ and Pearson correlation $\phi$ between $X$ and $Y$:
+
+```{r calc-pi}
+pi_vec <- calc_pi(p = 0.35, q = 0.65, phi = 0)
+names(pi_vec) <- c("XY=11", "XY=10", "XY=01", "XY=00")
+print(round(pi_vec, 4))
+
+# Feasible correlation range
+phi_bounds(p = 0.35, q = 0.65)
+```
+
+## Sample Size: Margin-Based (Mode 1)
+
+Provide lower-dose rates, efficacy margin $\delta$, and toxicity margin $d$:
+
+```{r mode1}
+res <- calc_sample_size_utility_approx(
+  pL    = 0.30,
+  qL    = 0.70,
+  delta = 0.10,
+  d     = 0.15,
+  phi   = 0,
+  alpha_L = 0.80,
+  alpha_H = 0.80
+)
+print(res)
+```
+
+The output includes sample size per arm `n`, selection threshold `lambda_u`, and probability of correct selection (PCS) for each dose.
+
+## Sample Size: Partial-Direct (Mode 2)
+
+If you have partial information about the higher dose:
+
+```{r mode2}
+res2 <- calc_sample_size_utility_approx(
+  pL    = 0.30, qL = 0.70,
+  pH_L  = 0.20, qH_L = 0.05,   # higher-dose rates if lower is optimal
+  pL_H  = 0.40, qL_H = 0.15,   # lower-dose rates if higher is optimal
+  phi   = 0,
+  alpha_L = 0.80, alpha_H = 0.80,
+  mode  = 2
+)
+print(res2)
+```
+
+## Interactive Shiny App
+
+For an interactive GUI covering all design modes:
+
+```r
+run_dosopt_app()
+```
+
+## Next Steps
+
+- **Exact methods**: `vignette("sample-size-methods")`
+- **Bias & Type I error**: `vignette("bias-and-type1")`
+- **Time-to-event endpoints**: `vignette("tte-endpoints")`

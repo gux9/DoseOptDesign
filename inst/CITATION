@@ -1,0 +1,19 @@
+citHeader("To cite dosopt in publications, please use:")
+
+bibentry(
+  bibtype      = "Article",
+  title        = "A Utility Score-Based Dose Optimization Design Under {FDA}'s {Project Optimus} Initiative",
+  author       = c(
+    person("Xuemin", "Gu"),
+    person("Cong",   "Xu"),
+    person("Lei",    "Xu"),
+    person("Ying",   "Yuan")
+  ),
+  journal      = "Manuscript in preparation",
+  year         = "2025",
+  textVersion  = paste(
+    "Gu X, Xu C, Xu L, Yuan Y (2025).",
+    "A Utility Score-Based Dose Optimization Design Under FDA's Project Optimus Initiative.",
+    "Manuscript in preparation."
+  )
+)
