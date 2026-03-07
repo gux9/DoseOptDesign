@@ -1,0 +1,37 @@
+# Generated manually - use roxygen2::roxygenise() to regenerate
+
+# Core helpers
+export(calc_pi)
+export(calc_utility)
+export(calc_utility_moments)
+
+# Sample size - utility-based
+export(calc_sample_size_utility_approx)
+export(calc_sample_size_utility_exact)
+
+# Sample size - ROSE
+export(calc_sample_size_rose_approx)
+export(calc_sample_size_rose_exact)
+
+# Exact PMF computation
+export(compute_pmf_S)
+export(compute_pmf_diff_unified)
+
+# Analytical bias and Type I error
+export(calc_analytical_bias)
+export(calc_analytical_type1_error)
+
+# Simulation
+export(compare_bias_methods_fast_enhanced_v2)
+
+# Shiny app launcher
+export(run_app)
+
+# Print methods
+S3method(print, dose_design)
+S3method(print, dose_design_exact)
+S3method(print, rose_design)
+
+# Imports
+importFrom(stats, dbinom, pbinom, pnorm, qnorm, rbinom, rexp, rnorm,
+           runif, sd, setNames, var, vcov, coef)

@@ -1,0 +1,38 @@
+Package: DoseOptDesign
+Title: Utility Score Framework for Dose Optimization Studies
+Version: 0.1.0
+Authors@R: c(
+    person("Xuemin", "Gu", email = "xuemin.gu@bicycletx.com", role = c("aut", "cre")),
+    person("Cong", "Xu", role = "aut"),
+    person("Lei", "Xu", role = "aut"),
+    person("Ying", "Yuan", role = "aut")
+  )
+Description: A frequentist framework for one-stage randomized dose optimization
+    studies using clinically interpretable utility scores to integrate binary
+    efficacy and safety endpoints. Implements sample size determination via
+    normal approximation and exact multinomial methods, analytical expressions
+    for selection-induced bias in response rate estimation, and plugin
+    estimators for Type I error inflation in confirmatory trials. Includes
+    the ROSE (Randomized Optimal Selection) design as a special case.
+    Supports time-to-event confirmatory endpoint analysis with landmark
+    survival, one-sample exponential, and two-sample Cox/log-rank tests.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: R (>= 4.0.0)
+Imports:
+    stats
+Suggests:
+    copula,
+    survival,
+    future,
+    future.apply,
+    parallelly,
+    shiny,
+    shinythemes,
+    DT,
+    shinyBS,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/xuemingu/DoseOptDesign
