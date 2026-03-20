@@ -1,3 +1,43 @@
+Package: DoseOptDesign
+Title: Utility Score Framework for Dose Optimization Studies
+Version: 1.0.0
+Authors@R: c(
+    person("Xuemin", "Gu", 
+           email = "xuemin.gu@bicycletx.com", 
+           role = c("aut", "cre")),
+    person("Cong", "Xu", role = "aut"),
+    person("Lei", "Xu", role = "aut"),
+    person("Ying", "Yuan", role = "aut")
+)
+Description: Implements a utility score framework for dose optimization studies 
+    with binary efficacy-safety endpoints. Provides sample size determination 
+    using normal approximation and exact multinomial calculations, characterizes 
+    selection-induced bias in two-stage designs, and quantifies Type I error 
+    inflation in confirmatory analyses. Methods are described in Gu et al. (2025) 
+    <arXiv:2603.15884>.
+License: MIT + file LICENSE
+URL: https://github.com/YOUR_USERNAME/DoseOptDesign, https://arxiv.org/abs/2603.15884
+BugReports: https://github.com/YOUR_USERNAME/DoseOptDesign/issues
+Encoding: UTF-8
+RoxygenNote: 7.3.3
+Imports: 
+    stats,
+    methods
+Suggests:
+    shiny (>= 1.7.0),
+    shinythemes,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    copula,
+    survival,
+    DT,
+    shinyBS,
+    future.apply,
+    parallelly
+VignetteBuilder: knitr
+NeedsCompilation: no
+
 # Generated manually - use roxygen2::roxygenise() to regenerate
 
 # Core helpers
