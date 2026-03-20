@@ -1,12 +1,40 @@
+<!-- badges: start -->
+[![arXiv](https://img.shields.io/badge/arXiv-2603.15884-b31b1b.svg)](https://arxiv.org/abs/2603.15884)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+
 # DoseOptDesign
 
 A utility score framework for dose optimization studies with binary
 efficacy-safety endpoints. Implements sample size determination and
 selection-induced bias characterization as described in:
 
-> Gu X, Xu C, Xu L, Yuan Y. *A Utility Score Framework for Dose
+
+> Gu, X., Xu, C., Xu, L., & Yuan, Y. (2025). A Utility Score Framework for Dose
 > Optimization Studies with Binary Efficacy-Safety Endpoints: Sample Size
-> Determination and Bias Characterization.* 2025.
+> Determination and Bias Characterization. *arXiv preprint arXiv:2603.15884*. https://arxiv.org/abs/2603.15884
+
+## Citation
+
+If you use this package in your research, please cite:
+```bibtex
+@misc{gu2025utility,
+  title={A Utility Score Framework for Dose Optimization Studies with Binary 
+         Efficacy-Safety Endpoints: Sample Size Determination and Bias Characterization},
+  author={Gu, Xuemin and Xu, Cong and Xu, Lei and Yuan, Ying},
+  year={2025},
+  eprint={2603.15884},
+  archivePrefix={arXiv},
+  primaryClass={stat.ME},
+  url={https://arxiv.org/abs/2603.15884}
+}
+```
+## Documentation
+
+- **Getting started vignette**: `vignette("getting-started", package = "DoseOptDesign")`
+- **Function help**: `?calc_sample_size_utility_approx`
+- **Package overview**: `?DoseOptDesign`
+- **arXiv manuscript**: https://arxiv.org/abs/2603.15884
 
 ## Installation
 
