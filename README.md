@@ -10,7 +10,7 @@ efficacy-safety endpoints. Implements sample size determination and
 selection-induced bias characterization as described in:
 
 
-> Gu, X., Xu, C., Xu, L., & Yuan, Y. (2025). A Utility Score Framework for Dose
+> Gu, X., Xu, C., Xu, L., & Yuan, Y. (2026). A Utility Score Framework for Dose
 > Optimization Studies with Binary Efficacy-Safety Endpoints: Sample Size
 > Determination and Bias Characterization. *arXiv preprint arXiv:2603.15884*. https://arxiv.org/abs/2603.15884
 
