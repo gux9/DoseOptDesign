@@ -1,46 +1,38 @@
-Package: dosopt
-Type: Package
+Package: DoseOptDesign
 Title: Utility Score Framework for Dose Optimization Studies
-Version: 0.1.0
-Date: 2026-02-18
+Version: 0.1.1
 Authors@R: c(
-    person("Xuemin", "Gu", role = c("aut", "cre"),
-           email = "xuemin.gu@bicycletx.com"),
+    person("Xuemin", "Gu", email = "xuemin.gu@bicycletx.com", role = c("aut", "cre")),
     person("Cong", "Xu", role = "aut"),
     person("Lei", "Xu", role = "aut"),
-    person("Ying", "Yuan", role = "aut"))
-Description: Implements a frequentist framework for one-stage randomized dose
-    optimization studies under the FDA Project Optimus initiative. The package
-    provides: (1) a margin-based utility score approach integrating binary
-    efficacy and safety endpoints; (2) closed-form and exact sample size
-    formulas to achieve prespecified Probabilities of Correct Selection (PCS);
-    (3) analytical expressions for selection-induced bias in response rate
-    estimation; (4) Type I error inflation calculations for binary and
-    time-to-event confirmatory endpoints; and (5) Monte Carlo simulation
-    validation. The framework generalizes the one-stage Randomized Optimal
-    Selection (ROSE) design as a special case. An interactive Shiny application
-    is included for design exploration and simulation.
-License: GPL-3
+    person("Ying", "Yuan", role = "aut")
+  )
+Description: A frequentist framework for one-stage randomized dose optimization
+    studies using clinically interpretable utility scores to integrate binary
+    efficacy and safety endpoints. Implements sample size determination via
+    normal approximation and exact multinomial methods, analytical expressions
+    for selection-induced bias in response rate estimation, and plugin
+    estimators for Type I error inflation in confirmatory trials. Includes
+    the ROSE (Randomized Optimal Selection) design as a special case.
+    Supports time-to-event confirmatory endpoint analysis with landmark
+    survival, one-sample exponential, and two-sample Cox/log-rank tests.
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
 Depends: R (>= 4.0.0)
 Imports:
-    stats,
-    methods
+    stats
 Suggests:
-    shiny (>= 1.7.0),
+    copula,
+    survival,
+    future,
+    future.apply,
+    parallelly,
+    shiny,
     shinythemes,
     DT,
     shinyBS,
-    copula,
-    survival,
-    future.apply,
-    parallelly,
-    knitr,
-    rmarkdown,
     testthat (>= 3.0.0)
-VignetteBuilder: knitr
-RoxygenNote: 7.3.2
 Config/testthat/edition: 3
-URL: https://github.com/xueminGu/dosopt
-BugReports: https://github.com/xueminGu/dosopt/issues
+URL: https://github.com/xuemingu/DoseOptDesign
