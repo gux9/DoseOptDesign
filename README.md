@@ -1,159 +1,139 @@
-# dosopt: Dose Optimization Design Using Utility Score Framework
-
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/xuemin-gu/dosopt/workflows/R-CMD-check/badge.svg)](https://github.com/xuemin-gu/dosopt/actions)
-[![CRAN status](https://www.r-pkg.org/badges/version/dosopt)](https://CRAN.R-project.org/package=dosopt)
+[![arXiv](https://img.shields.io/badge/arXiv-2603.15884-b31b1b.svg)](https://arxiv.org/abs/2603.15884)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-## Overview
+# DoseOptDesign
 
-**dosopt** implements a frequentist framework for one-stage randomized dose optimization studies with binary efficacy and safety endpoints under FDA's Project Optimus initiative. The package provides:
+A utility score framework for dose optimization studies with binary
+efficacy-safety endpoints. Implements sample size determination and
+selection-induced bias characterization as described in:
 
-- **Utility-based sample size calculation** (approximate normal and exact multinomial methods)
-- **ROSE design** (efficacy-only special case; Wang et al. 2025)
-- **Multi-scenario direct approach** for robust sample size determination
-- **Selection-induced bias** characterization for binary and time-to-event endpoints
-- **Type I error inflation** formulas for downstream confirmatory trials
-- **Monte Carlo simulation** for design validation
-- **Interactive Shiny application** for design exploration
+
+> Gu, X., Xu, C., Xu, L., & Yuan, Y. (2026). A Utility Score Framework for Dose
+> Optimization Studies with Binary Efficacy-Safety Endpoints: Sample Size
+> Determination and Bias Characterization. *arXiv preprint arXiv:2603.15884*. https://arxiv.org/abs/2603.15884
+
+## Citation
+
+If you use this package in your research, please cite:
+```bibtex
+@misc{gu2025utility,
+  title={A Utility Score Framework for Dose Optimization Studies with Binary 
+         Efficacy-Safety Endpoints: Sample Size Determination and Bias Characterization},
+  author={Gu, Xuemin and Xu, Cong and Xu, Lei and Yuan, Ying},
+  year={2025},
+  eprint={2603.15884},
+  archivePrefix={arXiv},
+  primaryClass={stat.ME},
+  url={https://arxiv.org/abs/2603.15884}
+}
+```
+## Documentation
+
+- **Getting started vignette**: `vignette("getting-started", package = "DoseOptDesign")`
+- **Function help**: `?calc_sample_size_utility_approx`
+- **Package overview**: `?DoseOptDesign`
+- **arXiv manuscript**: https://arxiv.org/abs/2603.15884
 
 ## Installation
 
 ```r
-# Install from CRAN
-install.packages("dosopt")
+# Install from local source
+install.packages("path/to/DoseOptDesign", repos = NULL, type = "source")
 
-# Or install the development version from GitHub
-# install.packages("devtools")
-devtools::install_github("xuemin-gu/dosopt")
+# Or via devtools/remotes from GitHub
+# devtools::install_github("xuemingu/DoseOptDesign")
 ```
 
 ## Quick Start
 
-### Utility-Based Sample Size (Approximate)
+### 1. Sample Size Calculation
 
 ```r
-library(dosopt)
+library(DoseOptDesign)
 
-# Compute sample size per arm using margin-based utility
-# Scenario: pL = 0.3, qL = 0.7, delta = 0.10, d = 0.15
-# Both arms need PCS >= 80%
-
-res <- calc_sample_size_utility_approx(
-  pL    = 0.3,   # efficacy rate at lower dose
-  qL    = 0.7,   # toxicity rate at lower dose
-  delta = 0.10,  # minimum clinically meaningful efficacy margin
-  d     = 0.15,  # maximum acceptable toxicity margin
-  phi   = 0,     # efficacy-safety correlation (0 = independence)
-  alpha_L = 0.8, # target PCS for lower dose
-  alpha_H = 0.8  # target PCS for higher dose
-)
-print(res)
-```
-
-### Exact Multinomial Sample Size
-
-```r
-res_exact <- calc_sample_size_utility_exact(
-  pL    = 0.3, qL = 0.7,
-  delta = 0.10, d = 0.15,
-  phi   = 0,
-  alpha_L = 0.8, alpha_H = 0.8,
-  max_n = 300
-)
-print(res_exact)
-```
-
-### ROSE Design (Efficacy-Only)
-
-```r
-# Replicates Wang et al. (2025) Table 1
-res_rose <- calc_sample_size_rose_approx(
-  pL    = 0.4,
-  delta = 0.15,
+# Utility-based design (approximate)
+design <- calc_sample_size_utility_approx(
+  pL = 0.3, qL = 0.5, delta = 0.10, d = 0.15, phi = 0,
   alpha_L = 0.8, alpha_H = 0.8
 )
-print(res_rose)
-```
+print(design)
 
-### Bias Characterization
-
-```r
-# Analytical bias after two-stage selection
-bias_res <- calc_bias(
-  pL    = 0.3, qL = 0.7,
-  delta = 0.10, d = 0.15,
-  phi   = 0, n1 = 60, n2 = 120
+# Utility-based design (exact multinomial)
+design_exact <- calc_sample_size_utility_exact(
+  pL = 0.3, qL = 0.5, delta = 0.10, d = 0.15, phi = 0,
+  alpha_L = 0.8, alpha_H = 0.8
 )
-print(bias_res)
+print(design_exact)
+
+# ROSE design (efficacy-only, for comparison)
+rose <- calc_sample_size_rose_approx(pL = 0.3, delta = 0.10)
+print(rose)
 ```
 
-### Type I Error Inflation (Z-test)
+### 2. Analytical Bias and Type I Error
 
 ```r
-t1e_res <- calc_type1_error(
-  bias_stage1 = bias_res$bias_stage1,
-  n1 = 60, n2 = 120,
-  p0 = 0.3, alpha = 0.05,
-  test = "z"
+# Compute selection-induced bias under null
+bias <- calc_analytical_bias(
+  p = 0.3, q = 0.8, phi = 0,
+  u = c(1, 0.8, 0.2, 0),
+  n1 = 60, n2 = 140
 )
-print(t1e_res)
+bias$bias_utility_combined   # Cov(X,U)-based plugin estimate
+bias$bias_response_combined  # Response-only max bound
+
+# Compute Type I error inflation
+t1e <- calc_analytical_type1_error(
+  p0 = 0.3,
+  bias_combined = bias$bias_utility_combined,
+  n_total = 200, alpha = 0.025
+)
+t1e$type1_z    # Z-test inflated Type I error
+t1e$type1_bin  # Binomial test inflated Type I error
 ```
 
-### Interactive Shiny Application
+### 3. Monte Carlo Simulation
 
 ```r
-run_dosopt_app()
+# Full simulation with TTE endpoints (requires copula, survival packages)
+sim <- compare_bias_methods_fast_enhanced_v2(
+  pL = 0.3, pH = 0.3, qL = 0.8, qH = 0.8, phi = 0,
+  N1 = 60, N2 = 140,
+  u = c(1, 0.8, 0.2, 0),
+  perform_tte_analysis = TRUE,
+  corr_efficacy_tte = 0.3,
+  nSim = 10000,
+  Alpha = 0.025, Alpha_tte = 0.025,
+  return_raw = FALSE
+)
 ```
 
-## Methodology
+### 4. Shiny App
 
-The utility score for a patient with outcome $(X, Y)$ (efficacy, no toxicity) is:
-
-$$U = u_1 X(1-Y) + u_2 X Y + u_3 (1-X)(1-Y) + u_4 (1-X)Y$$
-
-Under the independence constraint $u_1 - u_2 - u_3 + u_4 = 0$, with canonical weights $u_2 = 1/(1+r)$, $u_3 = r/(1+r)$ where $r = \delta/d$.
-
-The jointly optimal sample size satisfies:
-
-$$n = \left[\frac{z_{\alpha_L}\sqrt{v_L} - z_{1-\alpha_H}\sqrt{v_H}}{\Delta\mu_H - \Delta\mu_L}\right]^2$$
-
-Selection-induced bias in the confirmatory stage:
-
-$$\text{Bias} \approx \frac{\text{Cov}(X, U)}{\sigma_U \sqrt{n_1}} \cdot \frac{1}{\sqrt{\pi}} \exp\!\left(-\frac{\lambda_u^2 n_1}{4\sigma_U^2}\right)$$
-
-See the package vignettes for full mathematical details and worked examples.
-
-## Vignettes
-
-| Vignette | Description |
-|----------|-------------|
-| `vignette("introduction", package = "dosopt")` | Quick start and basic examples |
-| `vignette("sample-size-methods", package = "dosopt")` | Comparing approximate, exact, and direct approaches |
-| `vignette("bias-and-type1", package = "dosopt")` | Bias propagation and Type I error inflation |
-| `vignette("tte-endpoints", package = "dosopt")` | Time-to-event endpoints and surrogacy framework |
-
-## Citation
-
-If you use **dosopt** in your research, please cite:
-
-> Gu X, Xu C, Xu L, Yuan Y (2025). "A Utility Score-Based Dose Optimization Design Under FDA's Project Optimus Initiative." *Manuscript in preparation.*
-
-```bibtex
-@Article{dosopt2025,
-  author  = {Xuemin Gu and Cong Xu and Lei Xu and Ying Yuan},
-  title   = {A Utility Score-Based Dose Optimization Design Under {FDA}'s {Project Optimus} Initiative},
-  journal = {Manuscript in preparation},
-  year    = {2025},
-}
+```r
+DoseOptDesign::run_app()
 ```
 
-## Related Work
+## Key Functions
 
-- Wang et al. (2025). ROSE: Randomized dose Optimization design with a Selection rule based on Efficacy.
-- FDA Project Optimus: <https://www.fda.gov/patients/drug-development-process/step-3-clinical-research#Optimus>
-- BOIN design: Yuan Y, Hess KR, Hilsenbeck SG, Gilbert MR (2016). *J Clin Oncol*.
+| Function | Description |
+|---|---|
+| `calc_sample_size_utility_approx()` | Normal approximation sample size |
+| `calc_sample_size_utility_exact()` | Exact multinomial sample size |
+| `calc_sample_size_rose_approx()` | ROSE design (approximate) |
+| `calc_sample_size_rose_exact()` | ROSE design (exact) |
+| `calc_analytical_bias()` | Selection-induced bias formulas |
+| `calc_analytical_type1_error()` | Type I error inflation estimates |
+| `compare_bias_methods_fast_enhanced_v2()` | Monte Carlo simulation |
+| `calc_pi()` | Joint probabilities from marginals |
+| `calc_utility()` | Utility scores from trade-off ratio |
 
-## License
+## Dependencies
 
-GPL-3 © Xuemin Gu
+**Required:** R >= 4.0.0, stats
+
+**Optional (for simulation/TTE):** copula, survival, future, future.apply, parallelly
+
+**Optional (for Shiny app):** shiny, shinythemes, DT, shinyBS
